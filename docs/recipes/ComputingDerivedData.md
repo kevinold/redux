@@ -2,6 +2,36 @@
 
 [Reselect](https://github.com/faassen/reselect.git) is a simple library for creating memoized, composable **selector** functions. Reselect selectors can be used to efficiently compute derived data from the Redux store. 
 
+### Understanding Memoization
+
+Selectors can be written with or without memoization.
+
+[Chapter 3: Pure Happiness with Pure Functions](https://drboolean.gitbooks.io/mostly-adequate-guide/content/ch3.html) of the [Mostly adequate guide to FP (in javascript)](https://drboolean.gitbooks.io/mostly-adequate-guide//) discusses the basics and reasoning for using memoization.
+
+The difference between a non-memoized selector and a memoized selector are described below and covered in greater detail in the next section.
+
+#### Non-memoized Selector
+
+Here `visibilityFilterSelector` and `todosSelector` are input-selectors. They are created as ordinary non-memoized selector functions because they do not transform the data they select.
+```js
+const visibilityFilterSelector = (state) => state.visibilityFilter;
+const todosSelector = (state) => state.todos;
+```
+
+#### Memoized Selector
+```js
+export const visibleTodosSelector = createSelector(
+  [visibilityFilterSelector, todosSelector],
+  (visibilityFilter, todos) => {
+    return {
+      visibleTodos: selectTodos(todos, visibilityFilter),
+      visibilityFilter
+    };
+  }
+);
+```
+`visibleTodosSelector` on the other hand is a memoized selector. It takes `visibilityFilterSelector` and `todosSelector` as input-selectors, and a transform function that calculates the filtered todos list.
+
 ### Motivation for Memoized Selectors
 
 Let's revisit the [Todos List example](../basics/UsageWithReact.md):
